@@ -19,7 +19,7 @@
   
   <servlet-mapping>
  	 <servlet-name>ServletOne</servlet-name>
- 	 <url-pattern>/getToWork/*</url-pattern> <!-- this /* is to add any type of other searches more specific example such as avengersID -->
+ 	 <url-pattern>/Customers/*</url-pattern> <!-- this /* is to add any type of other searches more specific example such as avengersID -->
   </servlet-mapping>
   
 </web-app>

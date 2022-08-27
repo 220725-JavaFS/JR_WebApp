@@ -3,6 +3,7 @@ package com.revature.controllers;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.*;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -13,10 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.models.Customers;
 import com.revature.services.CustomerServices;
+import com.revature.services.WebServices;
 
 public class ControllerOne extends HttpServlet{ // CATALINA_Home is another name for tomcat
 	
-	private CustomerServices cs = new CustomerServices();
+	private WebServices ws = new WebServices();
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	//protected is what the HttpServlets already defines for the methods. You can make it public, but not private (or more restricted)
@@ -24,41 +26,36 @@ public class ControllerOne extends HttpServlet{ // CATALINA_Home is another name
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{ // this exception would be caught by and managed by Tomcat
 		
-		String URI = request.getRequestURI();
+		String URI = request.getRequestURI(); // WEEK4 DAY 3 VIdeo lectures last one
 		System.out.println(URI);
 		// /projectOneWAR/getToWork/{id}
-		
 		String[] urlSections = URI.split("/");
 		
-		if(urlSections.length == 3) {
-			
+		if(urlSections.length == 3) { // section {3} is where it returns all avenger, if there's another / it will return specifics
+		// gets className from URL
+		String className = urlSections[urlSections.length-1];
 		
-		
-		
-		List<Customers> list = cs.getAllCustomers();
-		
-		String json = objectMapper.writeValueAsString(list);
-		System.out.println(json);
+		// gets all Objects to jSonList via ServiceLayer
+		String jsonList = ws.getAllObjectsInJson(className);
 		
 		PrintWriter printWriter = response.getWriter(); // this message goes into the body
 		
-		printWriter.print(json);
+		printWriter.print(jsonList);
 		
 		response.setStatus(200);
 		
-		response.setContentType("application/json");
+		response.setContentType("application/json"); 
 		
+			// this example below will return a single customer using the {id} !
 		} else if(urlSections.length==4) {
 			try {
 			int id = Integer.valueOf(urlSections[3]);
 			
-			Customers customer = cs.getSingleCustomer(); // notice this is not going to work because we call our customers by username and password
+			String jsonId = ws.getCustomerByIdInJson(id);
 			
 			PrintWriter printWriter = response.getWriter();
 			
-			String json = objectMapper.writeValueAsString(customer);
-			
-			printWriter.print(json);
+			printWriter.print(jsonId);
 			response.setStatus(200);
 			response.setContentType("application/json");
 			
@@ -66,15 +63,58 @@ public class ControllerOne extends HttpServlet{ // CATALINA_Home is another name
 				response.setStatus(404);
 				return;
 			}
+			
+		}else if (urlSections.length==5) { // this will return a specific field from the customer!
+			try {
+				int id = Integer.valueOf(urlSections[3]);
+				// /blank/customers/3/modelField/
+				String fieldName = String.valueOf(urlSections[4]); // field retrieving from the 5th '/' 
+				
+				String jsonField = ws.getCustomerField(id, fieldName);
+				
+				PrintWriter printWriter = response.getWriter();
+				
+				printWriter.print(jsonField);
+				response.setStatus(200);
+				response.setContentType("application/json");
+			}catch (NumberFormatException nfe) {
+				response.setStatus(404);
+				return;
+			}catch (NoSuchMethodException  nsme) {
+	             response.setStatus(404);
+			}catch (SecurityException se) {
+				response.setStatus(404);
+			}catch (Exception e) {
+				response.setStatus(404);
+			}
 		}else {
 			response.setStatus(404);
 		}
 	}
 	
+	//---------------------(08/21/22)-doGET is completed and ready in services. Next is the bottom ones------------------------------------
+	
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 		
-		StringBuilder sb = new StringBuilder(); //WEEK4 DAY 2 VIDEO LECTURES
+		StringBuilder sb = new StringBuilder(); //WEEK4 DAY 3 VIDEO LECTURES time 3:14
+		
+		BufferedReader reader = request.getReader();
+		
+		String line = reader.readLine();
+		
+		while(line!=null) {
+			sb.append(line);
+			line=reader.readLine();
+		}
+		
+		String json = new String(sb);
+		
+		ws.
+		
+		/* -------- I comment this old stuff out. Instead of converting straight to json, we'll be sending the json to the deserializer in ORM-----
+		 
+		StringBuilder sb = new StringBuilder(); //WEEK4 DAY 3 VIDEO LECTURES
 		
 		BufferedReader reader = request.getReader();
 		
@@ -90,26 +130,95 @@ public class ControllerOne extends HttpServlet{ // CATALINA_Home is another name
 		
 		Customers customer = objectMapper.readValue(json, Customers.class);
 		
-		cs.createCustomer(customer);
+		ws.createCustomer(customer);
 		
 		response.setStatus(201);
-		
-		
-		
+		*/
 	}
 		
 	
+	@Override
+	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+		
+		StringBuilder sb = new StringBuilder(); //WEEK4 DAY 3 VIDEO LECTURES
+		
+		BufferedReader reader = request.getReader();
+		
+		String line = reader.readLine();
+		
+		while(line!=null) {
+			sb.append(line);
+			line=reader.readLine();
+		}
+		
+		String json = new String(sb);
+		System.out.println(json);
+		
+		
+		//client send complete customer info
+		Customers customer = objectMapper.readValue(json, Customers.class);
+		//updates entire entity
+		ws.updateCustomer(customer);
+		
+		response.setStatus(202);
+	}
 	
+	
+	@Override
+	protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 		
-	/*	
-		String URI = request.getRequestURI();
-		System.out.println(URI);
+		StringBuilder sb = new StringBuilder(); //WEEK4 DAY 3 VIDEO LECTURES
 		
-		PrintWriter print = response.getWriter(); // throws an IOException
-		print.print("<h1>Hello from your doGet method!</h1>"); //printing to the body of the response in this line
-		response.setStatus(218);
-		response.setHeader("content-type", "text/html");
-		*/
+		BufferedReader reader = request.getReader();
 		
-
-}
+		String line = reader.readLine();
+		
+		while(line!=null) {
+			sb.append(line);
+			line=reader.readLine();
+		}
+		
+		String json = new String(sb);
+		System.out.println(json);
+		
+		
+		//client send complete customer info
+		Customers customer = objectMapper.readValue(json, Customers.class);
+		//updates entire entity
+		ws.updateCustomer(customer);
+		
+		response.setStatus(202);
+	}
+	
+	@Override
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+		
+		StringBuilder sb = new StringBuilder(); //WEEK4 DAY 3 VIDEO LECTURES
+		
+		BufferedReader reader = request.getReader();
+		
+		String line = reader.readLine();
+		
+		while(line!=null) {
+			sb.append(line);
+			line=reader.readLine();
+		}
+		
+		String json = new String(sb);
+		System.out.println(json);
+		
+		
+		//client send complete customer info
+		Customers customer = objectMapper.readValue(json, Customers.class);
+		//updates entire entity
+		ws.deleteCustomer(customer);
+		
+		response.setStatus(200);
+		
+		//if (not good) {
+		//	response.setStatus(400); // bad request
+		}
+	}
+	
+}	
+	
