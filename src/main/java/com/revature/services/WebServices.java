@@ -1,75 +1,72 @@
 package com.revature.services;
 
-import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.revature.daos.WebDAOImpl;
 import com.revature.models.Customers;
+import com.revature.webDaos.WebDAOImpl;
 
 
 
 public class WebServices {
 
+	private Customers cust = new Customers();
 	private WebDAOImpl wDao = new WebDAOImpl();
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
-
 	
 	
-	@SuppressWarnings("unchecked")
-	public <T> String getAllObjectsInJson(String className){
-		
-		Class<T> clazz;
-		try {
-			clazz = (Class<T>) Class.forName(className).getDeclaredConstructor().newInstance();
-			List<T> list = wDao.getAllObjects(clazz);
+	public String getAllObjectsInJson(){
+	
+		List<Customers> list = wDao.getAllObjects(cust);
 			
-			try {
-				String json = objectMapper.writeValueAsString(list);
-				return json;
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-				return null;
-			}
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException | ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		String json;
+		try {
+			json = objectMapper.writeValueAsString(list);
+			return json;
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
 			return null;
 		}
 	}
 
-	public String getCustomerByIdInJson(int id) throws NumberFormatException{
+	public String getObjectByIdInJson(int id) throws NumberFormatException{
 		
-		Customers customer = wDao.getCustomerById(id);
+		Customers customer = wDao.getObjectById(cust, id);
+	
+		try {
+			String json = objectMapper.writeValueAsString(customer);
+			return json;
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return null;
+		}
 		
-		String json = objectMapper.writeValueAsString(customer);
+	}
+		
+	// this method calls getObjectById Method and selects the fieldName 
+	public String getFieldByIdInJson(int id, String fieldName) throws NumberFormatException, NoSuchMethodException, SecurityException, Exception{
+	
+		
+		Customers customer = wDao.getObjectById(cust, id);
+					
+		String getterName = "get"+fieldName.substring(0,1).toUpperCase()+fieldName.substring(1);
+		       
+	    Class<?> getterString = customer.getClass().getDeclaredField(fieldName).getType();
+		
+	    Method getterMethod = customer.getClass().getMethod(getterName, getterString);
+	    
+	    String jsonField =  (String) getterMethod.invoke(customer);
+				
+		String json = objectMapper.writeValueAsString(jsonField);
 		
 		return json;
-	}
-	
-	public String getCustomerField(int id, String fieldName) throws NumberFormatException, NoSuchMethodException, SecurityException, Exception{
-	
-			Customers customerObject = wDao.getCustomerById(id); // values after creating with ID
-		
-			Class<?> customerClass = customerObject.getClass(); // gets class properties
-						
-			String getterName = "get"+fieldName.substring(0,1).toUpperCase()+fieldName.substring(1);
-		       
-	        Method getterMethod = customerClass.getMethod(getterName);
-	        
-	        String jsonField =  (String) getterMethod.invoke(customerObject);
-			
-	        return jsonField;
-	}
+		}
+
 	
 	//---------------------------------------------doPost, doPut and doPatch methods ------------------------
 
-	public void sendJsonString(String json) {
-		OrmyS.deSerialize(json, null)
-	}
+	
 }

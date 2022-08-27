@@ -1,25 +1,24 @@
 package com.revature.controllers;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.*;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.models.Customers;
-import com.revature.services.CustomerServices;
+
+
 import com.revature.services.WebServices;
 
 public class ControllerOne extends HttpServlet{ // CATALINA_Home is another name for tomcat
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private WebServices ws = new WebServices();
-	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	//protected is what the HttpServlets already defines for the methods. You can make it public, but not private (or more restricted)
 	//this is a common interview question -> the method signature, make sure you know everything and the throws as well.
@@ -32,26 +31,30 @@ public class ControllerOne extends HttpServlet{ // CATALINA_Home is another name
 		String[] urlSections = URI.split("/");
 		
 		if(urlSections.length == 3) { // section {3} is where it returns all avenger, if there's another / it will return specifics
-		// gets className from URL
-		String className = urlSections[urlSections.length-1];
+		// gets className from URL		
+		// gets all Objects to jSonList via ServiceLayer	
+			try {
 		
-		// gets all Objects to jSonList via ServiceLayer
-		String jsonList = ws.getAllObjectsInJson(className);
-		
-		PrintWriter printWriter = response.getWriter(); // this message goes into the body
-		
-		printWriter.print(jsonList);
-		
-		response.setStatus(200);
-		
-		response.setContentType("application/json"); 
-		
+			String jsonList = ws.getAllObjectsInJson();
+			
+			PrintWriter printWriter = response.getWriter(); // this message goes into the body
+			
+			printWriter.print(jsonList);
+			
+			response.setStatus(200);
+			
+			response.setContentType("application/json"); 
+			} catch (Exception e){
+				e.printStackTrace();
+			}
+		//-----------------------------------------------------------------------------------------------------------------------------
 			// this example below will return a single customer using the {id} !
 		} else if(urlSections.length==4) {
 			try {
+						
 			int id = Integer.valueOf(urlSections[3]);
 			
-			String jsonId = ws.getCustomerByIdInJson(id);
+			String jsonId = ws.getObjectByIdInJson(id);
 			
 			PrintWriter printWriter = response.getWriter();
 			
@@ -70,7 +73,7 @@ public class ControllerOne extends HttpServlet{ // CATALINA_Home is another name
 				// /blank/customers/3/modelField/
 				String fieldName = String.valueOf(urlSections[4]); // field retrieving from the 5th '/' 
 				
-				String jsonField = ws.getCustomerField(id, fieldName);
+				String jsonField = ws.getFieldByIdInJson(id, fieldName);
 				
 				PrintWriter printWriter = response.getWriter();
 				
@@ -79,7 +82,6 @@ public class ControllerOne extends HttpServlet{ // CATALINA_Home is another name
 				response.setContentType("application/json");
 			}catch (NumberFormatException nfe) {
 				response.setStatus(404);
-				return;
 			}catch (NoSuchMethodException  nsme) {
 	             response.setStatus(404);
 			}catch (SecurityException se) {
@@ -92,7 +94,8 @@ public class ControllerOne extends HttpServlet{ // CATALINA_Home is another name
 		}
 	}
 	
-	//---------------------(08/21/22)-doGET is completed and ready in services. Next is the bottom ones------------------------------------
+	/*
+	// -------------------------------bottom ones are incomplete and not up-to-date-------------------------	
 	
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
@@ -133,7 +136,7 @@ public class ControllerOne extends HttpServlet{ // CATALINA_Home is another name
 		ws.createCustomer(customer);
 		
 		response.setStatus(201);
-		*/
+		-------------------------------------------------------------STOP HERE OF COMMENT
 	}
 		
 	
@@ -219,6 +222,8 @@ public class ControllerOne extends HttpServlet{ // CATALINA_Home is another name
 		//	response.setStatus(400); // bad request
 		}
 	}
+	
+	*/
 	
 }	
 	

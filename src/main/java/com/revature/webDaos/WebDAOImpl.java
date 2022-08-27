@@ -1,15 +1,25 @@
-package com.revature.daos;
+package com.revature.webDaos;
 
 import java.util.List;
 
-import com.revature.models.Connectivity;
+import com.revature.daos.CustomerDAOImpl;
 import com.revature.models.Customers;
+import com.revature.modelsORM.Connectivity;
+import com.revature.webDaos.*;
 
 	public class WebDAOImpl {
 	
-	private CustomerDAOImpl cDao = new CustomerDAOImpl(); 
+	private CustomerDAOImpl<Customers> cDao = new CustomerDAOImpl<Customers>(); 
 	private Connectivity connect;
-
+	
+	@SuppressWarnings("unchecked")
+	public List<Customers> getAllObjects(Customers cust){ // 1st in webServices
+		
+		return (List<Customers>) cDao.getAllObjects(cust.getClass());
+ 	}
+	
+	//connectToDatabase();
+	
 	public void insertObject(Object o) {
 		connectToDatabase();
 		cDao.insertObject(o);
@@ -20,14 +30,9 @@ import com.revature.models.Customers;
 		cDao.updateObject(o);
 	}
 	
-	public <T> List<T> getAllObjects(Class<T> clazz){
+	public Customers getObjectById(Customers cust, int id) { //2nd in webservices
 		connectToDatabase();
-		return cDao.getAllObjects(clazz);
-	}
-	
-	public <T> T getObjectById(Class<T> clazz, int id) {
-		connectToDatabase();
-		return cDao.getObjectById(clazz, id);
+		return cDao.getObjectById(cust.getClass(), id);
 	}
 	
 	public <T> T getObjectByFirstName(Class<T> clazz, String firstName) {
