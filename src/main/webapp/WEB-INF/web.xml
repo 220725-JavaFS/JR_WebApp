@@ -12,13 +12,13 @@
   
   <servlet>
   	<description>DoTheServletOne</description><!-- optional tag -->
-  	<display-name>ServletOne</display-name><!-- optional tag -->
-  	<servlet-name>ServletOne</servlet-name>
-  	<servlet-class>com.revature.controllers.ControllerOne</servlet-class>
+  	<display-name>ControllerOne</display-name><!-- optional tag -->
+  	<servlet-name>ControllerOne</servlet-name>
+  	<servlet-class>com.servlet.ControllerOne</servlet-class>
   </servlet>
   
   <servlet-mapping>
- 	 <servlet-name>ServletOne</servlet-name>
+ 	 <servlet-name>ControllerOne</servlet-name>
  	 <url-pattern>/Customers/*</url-pattern> <!-- this /* is to add any type of other searches more specific example such as avengersID -->
   </servlet-mapping>
   

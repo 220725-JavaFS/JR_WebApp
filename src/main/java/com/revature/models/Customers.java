@@ -11,12 +11,12 @@ public class Customers {
 	private String phone;
 	private String email;
 	private String occupation;
-	private int timesTrained;
+	private String timesTrained;
 	private String trainedDate;
 	private String notes;
 	
 	public Customers(String initialDate, String customerSource, String firstName, String lastName, String phone,
-			String email, String occupation, int timesTrained, String trainedDate, String notes) {
+			String email, String occupation, String timesTrained, String trainedDate, String notes) {
 		super();
 		this.initialDate = initialDate;
 		this.customerSource = customerSource;
@@ -78,10 +78,10 @@ public class Customers {
 	public void setOccupation(String occupation) {
 		this.occupation = occupation;
 	}
-	public int getTimesTrained() {
+	public String getTimesTrained() {
 		return timesTrained;
 	}
-	public void setTimesTrained(int timesTrained) {
+	public void setTimesTrained(String timesTrained) {
 		this.timesTrained = timesTrained;
 	}
 	public String getTrainedDate() {

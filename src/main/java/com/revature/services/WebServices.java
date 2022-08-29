@@ -19,23 +19,38 @@ public class WebServices {
 	
 	
 	public String getAllObjectsInJson(){
-	
-		List<Customers> list = wDao.getAllObjects(cust);
-			
-		String json;
+		List<Customers> list = wDao.getAllObjects(this.cust);
 		try {
-			json = objectMapper.writeValueAsString(list);
+			String json = objectMapper.writeValueAsString(list);
 			return json;
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
+	
+	/*
+	public static void main(String[] args) {
+		Customers customerTest = new Customers("02/22/22", "myfreind", "SHARM", "Rivas","888-888-8888","bossjarib@yahoo.com","engineer", 8, "04/44/44","hard trainer");
+		Customers emptyCustomer = new Customers();
+		WebServices wst = new WebServices();
+		System.out.println(customerTest);
+		wst.insertObject(customerTest);
+	
+		
+	}
+	*/
+	
+	public void insertObject(Customers customer) {
+		wDao.insertObject(customer);
+	}
+	
+	public void updateObject(Customers customer) {
+		wDao.updateObject(customer);
+	}
 
 	public String getObjectByIdInJson(int id) throws NumberFormatException{
-		
-		Customers customer = wDao.getObjectById(cust, id);
-	
+		Customers customer = wDao.getObjectById(this.cust, id);
 		try {
 			String json = objectMapper.writeValueAsString(customer);
 			return json;
@@ -45,12 +60,28 @@ public class WebServices {
 		}
 		
 	}
+	
+	public String getObjectByFirstNameInJson(String firstName) throws NumberFormatException{
+		Customers customer = wDao.getObjectByFirstName(this.cust, firstName);
+		try {
+			String json = objectMapper.writeValueAsString(customer);
+			return json;
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return null;
+		}
 		
-	// this method calls getObjectById Method and selects the fieldName 
+	}
+	
+	public void deleteObjectByIdInJson(int id) {
+		wDao.deleteObjectById(this.cust, id);
+	}
+		
+	// this method calls getObjectById Method and selects the fieldName here 
 	public String getFieldByIdInJson(int id, String fieldName) throws NumberFormatException, NoSuchMethodException, SecurityException, Exception{
 	
 		
-		Customers customer = wDao.getObjectById(cust, id);
+		Customers customer = wDao.getObjectById(this.cust, id);
 					
 		String getterName = "get"+fieldName.substring(0,1).toUpperCase()+fieldName.substring(1);
 		       
@@ -64,9 +95,5 @@ public class WebServices {
 		
 		return json;
 		}
-
-	
-	//---------------------------------------------doPost, doPut and doPatch methods ------------------------
-
 	
 }

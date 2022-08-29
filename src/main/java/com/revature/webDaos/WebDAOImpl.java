@@ -5,6 +5,7 @@ import java.util.List;
 import com.revature.daos.CustomerDAOImpl;
 import com.revature.models.Customers;
 import com.revature.modelsORM.Connectivity;
+import com.revature.services.WebServices;
 import com.revature.webDaos.*;
 
 	public class WebDAOImpl {
@@ -13,41 +14,56 @@ import com.revature.webDaos.*;
 	private Connectivity connect;
 	
 	@SuppressWarnings("unchecked")
-	public List<Customers> getAllObjects(Customers cust){ // 1st in webServices
-		
+	public List<Customers> getAllObjects(Customers cust){ 
+		connectToDatabase();
+		System.out.println("testing inside webDAOImpl");
 		return (List<Customers>) cDao.getAllObjects(cust.getClass());
  	}
-	
-	//connectToDatabase();
-	
-	public void insertObject(Object o) {
+		
+	public void insertObject(Customers cust) {
 		connectToDatabase();
-		cDao.insertObject(o);
+		cDao.insertObject(cust);
 	}
 	
-	public void updateObject(Object o) {
+	public void updateObject(Customers cust) {
 		connectToDatabase();
-		cDao.updateObject(o);
+		cDao.updateObject(cust);
 	}
 	
-	public Customers getObjectById(Customers cust, int id) { //2nd in webservices
+	public Customers getObjectById(Customers cust, int id) {
 		connectToDatabase();
 		return cDao.getObjectById(cust.getClass(), id);
 	}
 	
-	public <T> T getObjectByFirstName(Class<T> clazz, String firstName) {
+	public Customers getObjectByFirstName(Customers cust, String firstName) {
 		connectToDatabase();
-		return cDao.getObjectByFirstName(clazz, firstName);
+		return cDao.getObjectByFirstName(cust.getClass(), firstName);
 	}
 	
-	public void deleteObjectById(Object o, int id) {
+	public void deleteObjectById(Customers cust, int id) {
 		connectToDatabase();
-		cDao.deleteObjectById(o, id);
+		cDao.deleteObjectById(cust, id);
 	}
 	
-	//this allows us to connect to our Database through any ORM
+	//this allows us to connect to our Database 
+	
 	public void connectToDatabase() {
 		connect = new Connectivity("javafs220725.clmfaswsjivh.us-west-1.rds.amazonaws.com", "project1", "postgres", "Lucky123!");
 		cDao.initializeConnection(connect);
 		}
+	
+	
+	
+	
+	/*
+	public static void main(String[] args) {
+		Customers customerTest = new Customers("02/22/22", "myfreind", "SHARM", "Rivas","888-888-8888","bossjarib@yahoo.com","engineer", "8", "04/44/44","hard trainer");
+		Customers emptyCustomer = new Customers();
+		WebDAOImpl wdi = new WebDAOImpl();
+		System.out.println(customerTest);
+		wdi.insertObject(customerTest);
+	}
+	*/
 }
+	
+	
